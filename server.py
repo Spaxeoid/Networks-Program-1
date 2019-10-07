@@ -5,14 +5,33 @@
 from socket import *
 import sys
 import glob
+import os
+import os
 
-def list():
-    emailList = []
-    counter = 0
+def stat():
+    count = 0
+    size = 0
     for e in glob.glob("*.eml"):
-        emailList.append(e)
-        counter++r
-    return emailList, counter
+        email = os.stat(e)
+        count = count + 1
+        size = size + email.st_size
+    return size, count
+
+#def list():
+ #   count, size = 0
+  #  for e in glob.glob("*.eml"):
+   #     email = os.stat(e)
+    #    count = count + 1
+     #   size = size + email.st_size
+    #return size, count
+
+#def retr():
+
+#def dele():
+    
+#def top():
+
+#def quit():
 
 
 serverPort = int(sys.argv[1])
@@ -23,13 +42,17 @@ print('Server ready to receive...')
 while True:
     connectionSocket, addr = serverSocket.accept()
     print("Data received...")
-    sentence = connectionSocket.recv(2048).decode()
-    capitalizedSentence = sentence.upper()
+    command = connectionSocket.recv(2048).decode()
     print("Sending return messge...")
-    emailList, counter = list()
-    # connectionSocket.send(capitalizedSentence.encode())
-    for e in emailList:
-        connectionSocket.send(e.encode())
-    #connectionSocket.send(emailList.encode())
-    connectionSocket.close()
+
+    if command == 'LIST':
+        emailList, counter = list()
+    elif command == 'STAT':
+        size, count = stat()
+        output = str(count) + ' ' + str(size)
+        connectionSocket.send(output.encode())
+    elif command == 'QUIT':
+        connectionSocket.close()
+
+connectionSocket.close()
 
