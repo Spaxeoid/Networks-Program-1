@@ -4,21 +4,33 @@
 
 from socket import *
 import sys
-serverName = 'localhost'
-serverPort = int(sys.argv[1])
+import random
+
+if len(sys.argv) > 1:
+    serverName = int(sys.argv[1])
+    serverPort = int(sys.argv[2])
+else:
+    serverName = 'localhost'
+    serverPort = 55555
+
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
-sentence = input('List: ')
-clientSocket.send(sentence.encode())
-emailList = []
-#count = int(clientSocket.recv(2048).decode())
-#print(count)
-#for i in range(0, count - 1):
- #   print(i)
-  #  emailList.append(clientSocket.recv(2048).decode())
-#print(emailList[0])
 
-fromServer = clientSocket.recv(2048).decode()
+while True:
+    command = input('')
+    command = command.upper()
+    clientSocket.send(command.encode())
+    splitCommand = command.split()
 
-print('From server: ', fromServer)
+    fromServer = clientSocket.recv(2048).decode()
+    if splitCommand[0] == 'RETR':
+        fileName = 'TEMP_' + str(random.randint(1, 1000)) + '.eml'
+        retrievedEmail = open(fileName, 'x')
+        retrievedEmail = open(fileName, 'w')
+        retrievedEmail.write(fromServer)
+        print("went through if")
+    if fromServer == "+OK Adios":
+        print(fromServer)
+        break
+    print(fromServer)
 clientSocket.close()
